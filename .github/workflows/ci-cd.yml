@@ -29,6 +29,7 @@ jobs:
   build-android-dev:
     name: Build Android APK (Development)
     runs-on: ubuntu-latest
+     environment: flight booking 
     needs: test
     if: github.ref == 'refs/heads/develop'
     steps:
@@ -55,6 +56,8 @@ jobs:
   build-ios-dev:
     name: Build iOS IPA (Development)
     runs-on: ubuntu-latest
+    
+     environment: flight booking 
     needs: test
     if: github.ref == 'refs/heads/develop'
     steps:
@@ -81,6 +84,7 @@ jobs:
   build-android-staging:
     name: Build Android APK (Staging)
     runs-on: ubuntu-latest
+     environment: flight booking 
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
@@ -107,6 +111,7 @@ jobs:
   build-ios-staging:
     name: Build iOS IPA (Staging)
     runs-on: ubuntu-latest
+     environment: flight booking 
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
@@ -133,6 +138,7 @@ jobs:
   build-android-testing:
     name: Build Android APK (Testing)
     runs-on: ubuntu-latest
+     environment: flight booking 
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
@@ -159,6 +165,7 @@ jobs:
   build-ios-testing:
     name: Build iOS IPA (Testing)
     runs-on: ubuntu-latest
+     environment: flight booking 
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
