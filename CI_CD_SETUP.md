@@ -57,6 +57,21 @@ If you want to automatically submit to Google Play Store:
 3. Add it as a GitHub secret named `GOOGLE_SERVICE_ACCOUNT_KEY`
 4. Place the file in your project root as `google-service-account.json`
 
+### 5. App Store Connect Setup (Optional)
+
+If you want to automatically submit to App Store Connect:
+
+1. Get your Apple ID and Team ID from Apple Developer account
+2. Get your App Store Connect App ID
+3. Update the `eas.json` file with your actual values:
+   ```json
+   "ios": {
+     "appleId": "your-actual-apple-id@example.com",
+     "ascAppId": "your-actual-app-store-connect-app-id",
+     "appleTeamId": "your-actual-apple-team-id"
+   }
+   ```
+
 ## Pipeline Workflow
 
 ### Branch Strategy:
@@ -64,15 +79,15 @@ If you want to automatically submit to Google Play Store:
 - **`main` branch**: Triggers staging and production builds
 
 ### Build Profiles:
-1. **Development**: Debug builds for testing
-2. **Staging**: Internal distribution for testing
-3. **Production**: Release builds for app stores
+1. **Development**: Debug builds for testing (Android APK, iOS Simulator)
+2. **Staging**: Internal distribution for testing (Android APK, iOS IPA)
+3. **Production**: Release builds for app stores (Android APK, iOS IPA)
 
 ### What the Pipeline Does:
 
 1. **Test Job**: Runs TypeScript checks and linting
-2. **Build Jobs**: Creates APK files for different environments
-3. **Deploy Job**: Creates GitHub releases and optionally submits to Google Play Store
+2. **Build Jobs**: Creates APK and IPA files for different environments
+3. **Deploy Job**: Creates GitHub releases and optionally submits to app stores
 
 ## Local Development
 
@@ -86,8 +101,14 @@ npm run build:android-dev    # Development build
 npm run build:android-staging # Staging build
 npm run build:android-prod   # Production build
 
-# Submit to Google Play Store
-npm run submit:android
+# Build IPA locally
+npm run build:ios-dev        # Development build
+npm run build:ios-staging    # Staging build
+npm run build:ios-prod       # Production build
+
+# Submit to app stores
+npm run submit:android       # Google Play Store
+npm run submit:ios          # App Store Connect
 
 # Run tests
 npm run test
@@ -100,8 +121,10 @@ eas build --platform android --profile development
 eas build --platform android --profile staging
 eas build --platform android --profile production
 
-# Build for iOS (if needed)
+# Build for iOS
 eas build --platform ios --profile development
+eas build --platform ios --profile staging
+eas build --platform ios --profile production
 ```
 
 ## Troubleshooting

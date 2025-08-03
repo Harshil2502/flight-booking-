@@ -22,9 +22,9 @@ eas build:configure
 
 | Branch | Event | Builds |
 |--------|-------|--------|
-| `develop` | Push/PR | Development APK |
-| `main` | Push/PR | Staging APK |
-| `main` | Push only | Production APK + Release |
+| `develop` | Push/PR | Development APK + iOS Simulator |
+| `main` | Push/PR | Staging APK + iOS IPA |
+| `main` | Push only | Production APK + iOS IPA + Release |
 
 ## 🛠️ Local Commands
 
@@ -32,13 +32,17 @@ eas build:configure
 # Development
 npm start                    # Start dev server
 npm run build:android-dev   # Build dev APK
+npm run build:ios-dev       # Build dev iOS
 
 # Staging
 npm run build:android-staging  # Build staging APK
+npm run build:ios-staging      # Build staging iOS
 
 # Production
 npm run build:android-prod     # Build production APK
+npm run build:ios-prod         # Build production iOS
 npm run submit:android         # Submit to Play Store
+npm run submit:ios            # Submit to App Store
 
 # Testing
 npm run test                   # Run all tests
@@ -50,9 +54,9 @@ npm run lint                  # ESLint check
 
 | Profile | Purpose | Distribution |
 |---------|---------|--------------|
-| `development` | Debug builds | Internal |
-| `staging` | Testing builds | Internal |
-| `production` | Release builds | App Store |
+| `development` | Debug builds | Internal (APK + iOS Simulator) |
+| `staging` | Testing builds | Internal (APK + iOS IPA) |
+| `production` | Release builds | App Store (APK + iOS IPA) |
 
 ## 🔍 Monitoring
 
@@ -78,9 +82,15 @@ eas project:info
 
 ## 📦 Artifacts
 
+### Android
 - **Development APK**: Available in GitHub Actions artifacts
 - **Staging APK**: Available in GitHub Actions artifacts  
 - **Production APK**: Available in GitHub Actions artifacts + GitHub Releases
+
+### iOS
+- **Development IPA**: Available in GitHub Actions artifacts
+- **Staging IPA**: Available in GitHub Actions artifacts
+- **Production IPA**: Available in GitHub Actions artifacts + GitHub Releases
 
 ## 🔐 Security Notes
 

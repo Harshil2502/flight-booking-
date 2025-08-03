@@ -10,13 +10,18 @@
         "gradleCommand": ":app:assembleDebug"
       },
       "ios": {
-        "buildConfiguration": "Debug"
+        "buildConfiguration": "Debug",
+        "simulator": true
       }
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "buildConfiguration": "Release",
+        "distribution": "internal"
       }
     },
     "staging": {
@@ -24,27 +29,36 @@
       "android": {
         "buildType": "apk"
       },
+      "ios": {
+        "buildConfiguration": "Release",
+        "distribution": "internal"
+      },
       "env": {
         "APP_ENV": "staging"
       }
     },
-    "production": {
+    "testing": {
+      "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
+      "ios": {
+        "buildConfiguration": "Release",
+        "distribution": "internal"
+      },
       "env": {
-        "APP_ENV": "production"
+        "APP_ENV": "testing"
       }
     }
   },
   "submit": {
-    "production": {
+    "staging": {
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "production"
+        "track": "internal"
       }
     },
-    "staging": {
+    "testing": {
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
         "track": "internal"

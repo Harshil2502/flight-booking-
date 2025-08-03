@@ -6,6 +6,7 @@ interface EnvironmentConfig {
   isProduction: boolean;
   isDevelopment: boolean;
   isStaging: boolean;
+  isTesting: boolean;
 }
 
 const getEnvironmentConfig = (): EnvironmentConfig => {
@@ -18,6 +19,7 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     isProduction: appEnv === 'production',
     isDevelopment: appEnv === 'development',
     isStaging: appEnv === 'staging',
+    isTesting: appEnv === 'testing',
   };
 
   switch (appEnv) {
@@ -31,6 +33,12 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
       return {
         ...baseConfig,
         apiUrl: 'https://api.yourstaging.com',
+      };
+    
+    case 'testing':
+      return {
+        ...baseConfig,
+        apiUrl: 'https://api.yourtesting.com',
       };
     
     case 'development':

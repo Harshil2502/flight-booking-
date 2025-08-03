@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, ImageBackground, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { fonts, fontSizes } from '../utils/fonts';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
-  const { t } = useTranslation();
+  // Translation hook for future use
+  // const { t } = useTranslation();
   const fadeAnim = new Animated.Value(0);
   const scaleAnim = new Animated.Value(0.3);
 

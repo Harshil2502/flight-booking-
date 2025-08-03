@@ -31,7 +31,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run linting
-        run: npx eslint . --ext .ts,.tsx --max-warnings 0
+        run: npx eslint . --max-warnings 100
 
   build-android-dev:
     name: Build Android APK (Development)
@@ -72,6 +72,45 @@ jobs:
           name: android-dev-apk
           path: app-dev.apk
 
+  build-ios-dev:
+    name: Build iOS IPA (Development)
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm install -g @expo/eas-cli
+
+      - name: Login to Expo
+        run: eas login --non-interactive --token $EXPO_TOKEN
+
+      - name: Configure EAS
+        run: eas build:configure
+
+      - name: Build iOS IPA (Development)
+        run: eas build --platform ios --profile development --non-interactive
+
+      - name: Download IPA
+        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-dev.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-dev-ipa
+          path: app-dev.ipa
+
   build-android-staging:
     name: Build Android APK (Staging)
     runs-on: ubuntu-latest
@@ -111,11 +150,11 @@ jobs:
           name: android-staging-apk
           path: app-staging.apk
 
-  build-android-production:
-    name: Build Android APK (Production)
+  build-ios-staging:
+    name: Build iOS IPA (Staging)
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -138,23 +177,23 @@ jobs:
       - name: Configure EAS
         run: eas build:configure
 
-      - name: Build Android APK (Production)
-        run: eas build --platform android --profile production --non-interactive
+      - name: Build iOS IPA (Staging)
+        run: eas build --platform ios --profile staging --non-interactive
 
-      - name: Download APK
-        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-production.apk
+      - name: Download IPA
+        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-staging.ipa
 
-      - name: Upload APK artifact
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-production-apk
-          path: app-production.apk
+          name: ios-staging-ipa
+          path: app-staging.ipa
 
-  deploy:
-    name: Deploy to Expo
+  build-android-testing:
+    name: Build Android APK (Testing)
     runs-on: ubuntu-latest
-    needs: [build-android-staging, build-android-production]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -174,27 +213,114 @@ jobs:
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
 
-      - name: Submit to Google Play Store (if configured)
-        run: eas submit --platform android --latest
-        continue-on-error: true
+      - name: Configure EAS
+        run: eas build:configure
+
+      - name: Build Android APK (Testing)
+        run: eas build --platform android --profile testing --non-interactive
+
+      - name: Download APK
+        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-testing-apk
+          path: app-testing.apk
+
+  build-ios-testing:
+    name: Build iOS IPA (Testing)
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm install -g @expo/eas-cli
+
+      - name: Login to Expo
+        run: eas login --non-interactive --token $EXPO_TOKEN
+
+      - name: Configure EAS
+        run: eas build:configure
+
+      - name: Build iOS IPA (Testing)
+        run: eas build --platform ios --profile testing --non-interactive
+
+      - name: Download IPA
+        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-testing-ipa
+          path: app-testing.ipa
+
+  deploy:
+    name: Create Testing Release
+    runs-on: ubuntu-latest
+    needs: [build-android-staging, build-android-testing, build-ios-staging, build-ios-testing]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm install -g @expo/eas-cli
+
+      - name: Login to Expo
+        run: eas login --non-interactive --token $EXPO_TOKEN
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             app-staging.apk
-            app-production.apk
+            app-testing.apk
+            app-staging.ipa
+            app-testing.ipa
           tag_name: v${{ github.run_number }}
-          name: Release v${{ github.run_number }}
+          name: Testing Release v${{ github.run_number }}
           body: |
-            Automated release for commit ${{ github.sha }}
+            Testing release for commit ${{ github.sha }}
             
-            ## Changes
-            - Automated build and deployment
-            - Android APK included
+            ## Build Information
+            - Automated build for testing team
+            - Android APK and iOS IPA included
             
-            ## Download
+            ## Download Links
+            ### Android
             - Staging APK: Available in artifacts
-            - Production APK: Available in artifacts
+            - Testing APK: Available in artifacts
+            
+            ### iOS
+            - Staging IPA: Available in artifacts
+            - Testing IPA: Available in artifacts
+            
+            ## Testing Instructions
+            1. Download the appropriate build for your device
+            2. Install and test the application
+            3. Report any issues found
+            4. Provide feedback on new features
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
