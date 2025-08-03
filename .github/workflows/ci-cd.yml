@@ -16,22 +16,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npx eslint . --max-warnings 200
 
-  build-android-dev:
-    name: Build Android APK (Development)
+  build:
+    name: Build ${{ matrix.platform }} (${{ matrix.profile }})
     runs-on: ubuntu-latest
-     environment: flight booking 
     needs: test
-    if: github.ref == 'refs/heads/develop'
+    environment: flight booking
+    strategy:
+      matrix:
+        include:
+          - platform: android
+            profile: development
+            branch: develop
+          - platform: ios
+            profile: development
+            branch: develop
+          - platform: android
+            profile: staging
+            branch: main
+          - platform: ios
+            profile: staging
+            branch: main
+          - platform: android
+            profile: testing
+            branch: main
+          - platform: ios
+            profile: testing
+            branch: main
+    if: github.ref == format('refs/heads/{0}', matrix.branch)
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -45,154 +65,25 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - run: eas build --platform android --profile development --non-interactive
-      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-dev.apk
+      - name: Build App
+        run: eas build --platform ${{ matrix.platform }} --profile ${{ matrix.profile }} --non-interactive
+
+      - name: Download Build Artifact
+        run: |
+          FILE_NAME="app-${{ matrix.profile }}.${{ matrix.platform == 'android' && 'apk' || 'ipa' }}"
+          URL=$(eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl')
+          curl -L -o $FILE_NAME $URL
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
 
       - uses: actions/upload-artifact@v4
         with:
-          name: android-dev-apk
-          path: app-dev.apk
-
-  build-ios-dev:
-    name: Build iOS IPA (Development)
-    runs-on: ubuntu-latest
-    
-     environment: flight booking 
-    needs: test
-    if: github.ref == 'refs/heads/develop'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-      - run: npm ci
-
-      - uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - run: eas build --platform ios --profile development --non-interactive
-      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-dev.ipa
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ios-dev-ipa
-          path: app-dev.ipa
-
-  build-android-staging:
-    name: Build Android APK (Staging)
-    runs-on: ubuntu-latest
-     environment: flight booking 
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-      - run: npm ci
-
-      - uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - run: eas build --platform android --profile staging --non-interactive
-      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-staging.apk
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: android-staging-apk
-          path: app-staging.apk
-
-  build-ios-staging:
-    name: Build iOS IPA (Staging)
-    runs-on: ubuntu-latest
-     environment: flight booking 
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-      - run: npm ci
-
-      - uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - run: eas build --platform ios --profile staging --non-interactive
-      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-staging.ipa
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ios-staging-ipa
-          path: app-staging.ipa
-
-  build-android-testing:
-    name: Build Android APK (Testing)
-    runs-on: ubuntu-latest
-     environment: flight booking 
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-      - run: npm ci
-
-      - uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - run: eas build --platform android --profile testing --non-interactive
-      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.apk
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: android-testing-apk
-          path: app-testing.apk
-
-  build-ios-testing:
-    name: Build iOS IPA (Testing)
-    runs-on: ubuntu-latest
-     environment: flight booking 
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-      - run: npm ci
-
-      - uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - run: eas build --platform ios --profile testing --non-interactive
-      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.ipa
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ios-testing-ipa
-          path: app-testing.ipa
+          name: ${{ matrix.platform }}-${{ matrix.profile }}
+          path: ${{ env.FILE_NAME }}
 
   deploy:
     name: Create Testing Release
     runs-on: ubuntu-latest
-    needs: [build-android-staging, build-android-testing, build-ios-staging, build-ios-testing]
+    needs: build
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
@@ -207,13 +98,16 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
       - uses: softprops/action-gh-release@v1
         with:
           files: |
-            app-staging.apk
-            app-testing.apk
-            app-staging.ipa
-            app-testing.ipa
+            android-staging/app-staging.apk
+            android-testing/app-testing.apk
+            ios-staging/app-staging.ipa
+            ios-testing/app-testing.ipa
           tag_name: v${{ github.run_number }}
           name: Testing Release v${{ github.run_number }}
           body: |
