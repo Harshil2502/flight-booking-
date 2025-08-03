@@ -1,20 +1,31 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { View, Text } from 'react-native';
+import { Provider } from 'react-redux';
+import './src/i18n'
+import AppNavigator from '@navigation/AppNavigator';
+import { ErrorBoundary } from '@components/ErrorBoundary';
+import { store } from '@redux/store';
+import { useFonts } from '@expo-google-fonts/inter';
+import { fontConfig } from './src/utils/loadFonts';
 
-export default function App() {
+const App = () => {
+  const [fontsLoaded] = useFonts(fontConfig);
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <ErrorBoundary>
+        <AppNavigator />
+      </ErrorBoundary>
+    </Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
