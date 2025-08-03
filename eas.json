@@ -1,18 +1,19 @@
 {
   "cli": {
-    "version": ">= 5.9.1"
+    "version": ">= 5.9.1",
+    "appVersionSource": "app.json"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "gradleCommand": ":app:assembleDebug"
+        "buildType": "apk"
       },
       "ios": {
-        "buildConfiguration": "Debug",
-        "simulator": true
-      }
+        "buildConfiguration": "Debug"
+      },
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
@@ -20,9 +21,9 @@
         "buildType": "apk"
       },
       "ios": {
-        "buildConfiguration": "Release",
-        "distribution": "internal"
-      }
+        "buildConfiguration": "Release"
+      },
+      "channel": "preview"
     },
     "staging": {
       "distribution": "internal",
@@ -30,12 +31,12 @@
         "buildType": "apk"
       },
       "ios": {
-        "buildConfiguration": "Release",
-        "distribution": "internal"
+        "buildConfiguration": "Release"
       },
       "env": {
         "APP_ENV": "staging"
-      }
+      },
+      "channel": "staging"
     },
     "testing": {
       "distribution": "internal",
@@ -43,12 +44,12 @@
         "buildType": "apk"
       },
       "ios": {
-        "buildConfiguration": "Release",
-        "distribution": "internal"
+        "buildConfiguration": "Release"
       },
       "env": {
         "APP_ENV": "testing"
-      }
+      },
+      "channel": "testing"
     }
   },
   "submit": {
@@ -65,4 +66,4 @@
       }
     }
   }
-} 
+}
