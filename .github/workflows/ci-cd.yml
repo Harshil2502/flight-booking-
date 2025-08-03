@@ -50,9 +50,21 @@ jobs:
           - platform: ios
             profile: testing
             branch: main
-    if: github.ref == format('refs/heads/{0}', matrix.branch)
 
     steps:
+      - name: Check if branch matches
+        id: branch-check
+        run: |
+          if [[ "${GITHUB_REF##refs/heads/}" != "${{ matrix.branch }}" ]]; then
+            echo "skip=true" >> $GITHUB_ENV
+          else
+            echo "skip=false" >> $GITHUB_ENV
+          fi
+
+      - name: Skip if branch doesn't match
+        if: env.skip == 'true'
+        run: echo "Skipping build for ${{ matrix.platform }} (${{ matrix.profile }})" && exit 0
+
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -98,8 +110,7 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
 
       - uses: softprops/action-gh-release@v1
         with:
