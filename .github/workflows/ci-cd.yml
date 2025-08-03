@@ -15,23 +15,16 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run TypeScript check
-        run: npx tsc --noEmit
-
-      - name: Run linting
-        run: npx eslint . --max-warnings 200
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npx eslint . --max-warnings 200
 
   build-android-dev:
     name: Build Android APK (Development)
@@ -39,35 +32,22 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/develop'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - run: eas build --platform android --profile development --non-interactive
+      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-dev.apk
 
-      - name: Login to Expo
-        run: eas login --non-interactive --token $EXPO_TOKEN
-
-      - name: Configure EAS
-        run: eas build:configure
-
-      - name: Build Android APK (Development)
-        run: eas build --platform android --profile development --non-interactive
-
-      - name: Download APK
-        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-dev.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: android-dev-apk
           path: app-dev.apk
@@ -78,35 +58,22 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/develop'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - run: eas build --platform ios --profile development --non-interactive
+      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-dev.ipa
 
-      - name: Login to Expo
-        run: eas login --non-interactive --token $EXPO_TOKEN
-
-      - name: Configure EAS
-        run: eas build:configure
-
-      - name: Build iOS IPA (Development)
-        run: eas build --platform ios --profile development --non-interactive
-
-      - name: Download IPA
-        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-dev.ipa
-
-      - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: ios-dev-ipa
           path: app-dev.ipa
@@ -117,35 +84,22 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - run: eas build --platform android --profile staging --non-interactive
+      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-staging.apk
 
-      - name: Login to Expo
-        run: eas login --non-interactive --token $EXPO_TOKEN
-
-      - name: Configure EAS
-        run: eas build:configure
-
-      - name: Build Android APK (Staging)
-        run: eas build --platform android --profile staging --non-interactive
-
-      - name: Download APK
-        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-staging.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: android-staging-apk
           path: app-staging.apk
@@ -156,35 +110,22 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - run: eas build --platform ios --profile staging --non-interactive
+      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-staging.ipa
 
-      - name: Login to Expo
-        run: eas login --non-interactive --token $EXPO_TOKEN
-
-      - name: Configure EAS
-        run: eas build:configure
-
-      - name: Build iOS IPA (Staging)
-        run: eas build --platform ios --profile staging --non-interactive
-
-      - name: Download IPA
-        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-staging.ipa
-
-      - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: ios-staging-ipa
           path: app-staging.ipa
@@ -195,35 +136,22 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - run: eas build --platform android --profile testing --non-interactive
+      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.apk
 
-      - name: Login to Expo
-        run: eas login --non-interactive --token $EXPO_TOKEN
-
-      - name: Configure EAS
-        run: eas build:configure
-
-      - name: Build Android APK (Testing)
-        run: eas build --platform android --profile testing --non-interactive
-
-      - name: Download APK
-        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: android-testing-apk
           path: app-testing.apk
@@ -234,35 +162,22 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - run: eas build --platform ios --profile testing --non-interactive
+      - run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.ipa
 
-      - name: Login to Expo
-        run: eas login --non-interactive --token $EXPO_TOKEN
-
-      - name: Configure EAS
-        run: eas build:configure
-
-      - name: Build iOS IPA (Testing)
-        run: eas build --platform ios --profile testing --non-interactive
-
-      - name: Download IPA
-        run: eas build:list --limit 1 --json | jq -r '.[0].artifacts.buildUrl' | xargs curl -L -o app-testing.ipa
-
-      - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: ios-testing-ipa
           path: app-testing.ipa
@@ -273,26 +188,19 @@ jobs:
     needs: [build-android-staging, build-android-testing, build-ios-staging, build-ios-testing]
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
-
-      - name: Login to Expo
-        run: eas login --non-interactive --token $EXPO_TOKEN
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v1
         with:
           files: |
             app-staging.apk
@@ -323,4 +231,4 @@ jobs:
             3. Report any issues found
             4. Provide feedback on new features
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
