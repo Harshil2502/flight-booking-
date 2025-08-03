@@ -7,7 +7,7 @@ This guide will help you set up an automated CI/CD pipeline for your React Nativ
 1. **Expo Account**: Make sure you have an Expo account and are logged in
 2. **EAS CLI**: Install EAS CLI globally
    ```bash
-   npm install -g @expo/eas-cli
+   npm install -g eas-cli
    ```
 3. **GitHub Repository**: Your code should be in a GitHub repository
 

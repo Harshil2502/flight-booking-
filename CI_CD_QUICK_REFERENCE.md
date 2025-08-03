@@ -7,6 +7,7 @@
 npm run setup-ci-cd
 
 # Or manually
+npm install -g eas-cli
 eas login
 eas build:configure
 ```

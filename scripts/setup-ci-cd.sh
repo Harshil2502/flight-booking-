@@ -6,7 +6,7 @@ echo "=================================================="
 # Check if EAS CLI is installed
 if ! command -v eas &> /dev/null; then
     echo "❌ EAS CLI is not installed. Installing now..."
-    npm install -g @expo/eas-cli
+    npm install -g eas-cli
 else
     echo "✅ EAS CLI is already installed"
 fi

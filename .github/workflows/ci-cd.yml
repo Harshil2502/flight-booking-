@@ -52,7 +52,7 @@ jobs:
         run: npm ci
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
@@ -91,7 +91,7 @@ jobs:
         run: npm ci
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
@@ -130,7 +130,7 @@ jobs:
         run: npm ci
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
@@ -169,7 +169,7 @@ jobs:
         run: npm ci
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
@@ -208,7 +208,7 @@ jobs:
         run: npm ci
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
@@ -247,7 +247,7 @@ jobs:
         run: npm ci
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
@@ -286,7 +286,7 @@ jobs:
         run: npm ci
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Login to Expo
         run: eas login --non-interactive --token $EXPO_TOKEN
