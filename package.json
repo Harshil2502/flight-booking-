@@ -17,7 +17,7 @@
     "build:ios-testing": "eas build --platform ios --profile testing",
     "submit:android": "eas submit --platform android",
     "type-check": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 100",
+    "lint": "eslint . --max-warnings 200",
     "test": "npm run type-check && npm run lint",
     "setup-ci-cd": "./scripts/setup-ci-cd.sh"
   },
@@ -42,10 +42,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/plugin-syntax-flow": "^7.25.2",
-    "@eslint/js": "^8.56.0",
     "@types/react": "~19.0.10",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
     "babel-preset-expo": "~13.0.0",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.34.0",

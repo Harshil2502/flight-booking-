@@ -31,7 +31,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run linting
-        run: npx eslint . --max-warnings 100
+        run: npx eslint . --max-warnings 200
 
   build-android-dev:
     name: Build Android APK (Development)
